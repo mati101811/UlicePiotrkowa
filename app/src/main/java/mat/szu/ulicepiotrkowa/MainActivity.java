@@ -1,5 +1,6 @@
 package mat.szu.ulicepiotrkowa;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -41,6 +42,9 @@ public class MainActivity extends AppCompatActivity
     Map<String, Polyline> streetPolylines = new HashMap<>( );
     int guesses = 0;
     int maxGuesses;
+    AlertDialog alertDialog;
+    Button       ok;
+    AlertDialog.Builder dialogBuilder;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -60,6 +64,7 @@ public class MainActivity extends AppCompatActivity
         map.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
         map.setMultiTouchControls(true);
         map.setBuiltInZoomControls(false);
+        
         
         street.addTextChangedListener(new TextWatcher( )
         {
@@ -100,16 +105,18 @@ public class MainActivity extends AppCompatActivity
         
         maxGuesses = (int) streetsMap.keySet( ).stream( ).filter(key -> !key.endsWith("'")).count( );
         counter.setText("0/" + maxGuesses);
+        
+        loadDialog();
         counter.setOnClickListener(v -> summary( ));
         
     }
     
-    private void summary( )
+    private void loadDialog( )
     {
         LayoutInflater inflater = getLayoutInflater( );
         View           layout   = inflater.inflate(R.layout.summary, null);
         
-        Button       ok              = layout.findViewById(R.id.ok);
+        ok              = layout.findViewById(R.id.ok);
         LinearLayout summary_content = layout.findViewById(R.id.summary_content);
         streetPolylines.forEach((streetName, polyline) -> {
             if (polyline.getColor( ) == Color.GRAY && !streetName.endsWith("'"))
@@ -118,6 +125,21 @@ public class MainActivity extends AppCompatActivity
                 textView.setText(streetName);
                 textView.setTextColor(Color.RED);
                 summary_content.addView(textView);
+                textView.setOnClickListener(v->{
+                    map.getController( ).setZoom(18.0);
+                    GeoPoint target = polyline.getPoints( ).get(0);
+                    ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
+                    animator.setDuration(1000);
+                    animator.addUpdateListener(animation -> {
+                        float fraction = (float) animation.getAnimatedValue();
+                        GeoPoint current = new GeoPoint(
+                                map.getMapCenter().getLatitude() + (target.getLatitude() - map.getMapCenter().getLatitude()) * fraction,
+                                map.getMapCenter().getLongitude() + (target.getLongitude() - map.getMapCenter().getLongitude()) * fraction
+                        );
+                        map.getController().setCenter(current);
+                    });
+                    animator.start();
+                });
             }
         });
         streetPolylines.forEach((streetName, polyline) -> {
@@ -127,15 +149,37 @@ public class MainActivity extends AppCompatActivity
                 textView.setText(streetName);
                 textView.setTextColor(Color.GREEN);
                 summary_content.addView(textView);
+                textView.setOnClickListener(v->{
+                    
+                    map.getController( ).setZoom(18.0);
+                    GeoPoint target = polyline.getPoints( ).get(0);
+                    ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
+                    animator.setDuration(1000);
+                    animator.addUpdateListener(animation -> {
+                        float fraction = (float) animation.getAnimatedValue();
+                        GeoPoint current = new GeoPoint(
+                                map.getMapCenter().getLatitude() + (target.getLatitude() - map.getMapCenter().getLatitude()) * fraction,
+                                map.getMapCenter().getLongitude() + (target.getLongitude() - map.getMapCenter().getLongitude()) * fraction
+                        );
+                        map.getController().setCenter(current);
+                    });
+                    animator.start();
+                });
             }
         });
         //alert dialog
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder = new AlertDialog.Builder(this);
         dialogBuilder.setView(layout);
-        AlertDialog builder = dialogBuilder.create( );
-        builder.show( );
-        
-        ok.setOnClickListener(v -> builder.dismiss( ));
+        alertDialog = dialogBuilder.create( );
+    }
+    
+    private void summary( )
+    {
+        //zoom map
+        alertDialog.show();
+        ok.setOnClickListener(v -> {
+            alertDialog.dismiss( );
+        });
     }
     
     private void check( )
