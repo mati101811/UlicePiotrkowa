@@ -1,4 +1,4 @@
-# Ulice Piotrkowa
+# Ulice Piotrkowa Android Learning App
 
 **Ulice Piotrkowa** is a Android learning app designed to help users learn the streets of Piotrków. It offers two engaging modes: **Clicking** and **Typing**. In the Clicking mode, users need to click as close as possible to the street location on a map, and the app calculates the distance as a result. In the Typing mode, users must type in the names of all streets displayed on the map, earning points for each correctly typed street. This app is perfect for anyone looking to familiarize themselves with Piotrków's streets in an interactive way. App has nearly 300 streets.
 
