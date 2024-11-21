@@ -1,0 +1,11 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.UlicePiotrkowa" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">#3E5E3F</item>
+        <item name="colorOnPrimary">@android:color/primary_text_dark</item>
+        <item name="greenContainer">@color/greenContainerDark</item>
+        <item name="redContainer">@color/redContainerDark</item>
+    </style>
+</resources>
